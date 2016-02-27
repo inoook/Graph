@@ -108,21 +108,17 @@ public class ParamViewer : MonoBehaviour {
 	public static int WINDOW_COUNT = 0;
 	public static int BASE_WINDOW_ID = 0;
 
-	public enum Anchor{
-		UpperLeft, UpperRight, LowerLeft, LowerRight
-	}
 	
 	private int windowId = 0;
 	public GUISkin guiSkin;
-	public Anchor anchor = Anchor.UpperLeft;
 	
-	private Rect windowRect = new Rect();
-	public Vector2 windowMargin = new Vector2(10,10);
+	public Rect windowRect = new Rect();
+	public Vector2 viewSize = new Vector2(100,100);
 	public Color graphHeightColor = new Color(0,0,0,0.25f);
 	
-	public int graphHeight = 100;
+	private int graphHeight;
 	private int graphHeightHalf;
-	public float zoomX = 1;
+	private float zoomX;
 	
 	public int bufferNum = 100;
 	
@@ -134,42 +130,10 @@ public class ParamViewer : MonoBehaviour {
 		WINDOW_COUNT++;
 		windowId = BASE_WINDOW_ID + WINDOW_COUNT;
 	}
-	
-	void UpdateMargin()
+
+	void Start()
 	{
-		float marginW;
-		float marginH;
-		float w = bufferNum*zoomX;
-		float h = windowRect.height;
-		
-		if(anchor == Anchor.UpperRight || anchor == Anchor.LowerRight){
-			marginW = Screen.width - w - windowMargin.x;
-		}else{
-			marginW = windowMargin.x;
-		}
-		if(anchor == Anchor.LowerRight || anchor == Anchor.LowerLeft){
-			marginH = Screen.height - h - windowMargin.y;
-		}else{
-			marginH = windowMargin.y;
-		}
-		windowRect = new Rect(marginW, marginH, w, h);
-		
-	}
-	
-	void UpdatePos()
-	{
-		float w = bufferNum*zoomX;
-		float h = windowRect.height;
-		if(anchor == Anchor.UpperRight || anchor == Anchor.LowerRight){
-			windowMargin.x = Screen.width - w - windowRect.x;
-		}else{
-			windowMargin.x = windowRect.x;
-		}
-		if(anchor == Anchor.LowerRight || anchor == Anchor.LowerLeft){
-			windowMargin.y = Screen.height - h - windowRect.y;
-		}else{
-			windowMargin.y = windowRect.y;
-		}
+		windowRect.width = viewSize.x;
 	}
 	
 	public void SetGraphParam(GraphParam graph)
@@ -231,29 +195,29 @@ public class ParamViewer : MonoBehaviour {
 			graphs[i].zoomX = zoomX;
 			graphs[i].bufferNum = bufferNum;
 		}
-		windowRect.height = 0;//reset windowRect height
 	}
 	
 //	public Color guiColor = Color.white;
 	
 	void OnGUI()
 	{
-//		GUI.color = guiColor;
 		
 		if(guiSkin != null){
 			GUI.skin = guiSkin;
 		}
-		
+
+		graphHeight = (int)viewSize.y;
+
 		graphHeightHalf = graphHeight / 2;
-		UpdateMargin();
 
 		windowRect = GUILayout.Window(windowId, windowRect, DoMyWindow, this.gameObject.name);
-		
-		UpdatePos();
+
 	}
 	
 	
 	void DoMyWindow(int windowID) {
+
+		windowRect.width = viewSize.x;
 
 		GUILayout.BeginArea(new Rect(0,18, windowRect.width, graphHeight));
 		Color myColor = GUI.color;
@@ -263,7 +227,7 @@ public class ParamViewer : MonoBehaviour {
 		GUILayout.Box("", GUILayout.MinHeight(graphHeight), GUILayout.Width(windowRect.width));
 		GUI.color = myColor;
 		
-		windowRect.width = bufferNum*zoomX;
+		zoomX = windowRect.width / bufferNum;
 		
 		DrawBaseLine();
 		

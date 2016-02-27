@@ -3,26 +3,21 @@ using System.Collections;
 
 public class Test2 : MonoBehaviour {
 
-	public float v = 0;
-	public float w = 0;
 	public ParamViewer pramView;
 
 	public GraphParam graph;
+	public ExtraLineParam extraLine;
+	
+	[Header("Test")]
+	public float v = 0;
+	public float w = 0;
 
 	public float amp = 5.0f;
+
 	// Use this for initialization
 	void Start () {
 
-		graph = new GraphParam("cube.v");
-		graph.maxY = 5.0f;
-		graph.color = Color.blue;
-		graph.drawType = GraphParam.DrawType.Line;
 		pramView.SetGraphParam(graph);
-
-		ExtraLineParam extraLine = new ExtraLineParam();
-		extraLine.maxY = 5.0f;
-		extraLine.color = Color.magenta;
-		extraLine.y = 5.0f;
 		pramView.SetExtraLine(extraLine);
 	}
 
