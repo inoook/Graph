@@ -10,18 +10,17 @@ public class GraphParam{
 	{
 		Line, Bar
 	}
-	
+
 	[HideInInspector]
 	public List<Vector3> values;
-	
-	public string name;
-	public DrawType drawType = DrawType.Line;
-	
+
 	[HideInInspector]
 	public float zoomX, zoomY;
 	
+	public string name;
 	public float maxY;
 	public Color color;
+	public DrawType drawType = DrawType.Line;
 	
 	[HideInInspector]
 	public float min, max;
@@ -34,11 +33,12 @@ public class GraphParam{
 		name = name_;
 	}
 	
-	public GraphParam(string name_, float maxY_, Color color_) : this()
+	public GraphParam(string name_, float maxY_, Color color_, DrawType type_) : this()
 	{
 		name = name_;
 		maxY = maxY_;
 		color = color_;
+		drawType = type_;
 	}
 	
 	public GraphParam()
@@ -54,14 +54,11 @@ public class GraphParam{
 		max = 0;
 		
 		bufferNum = 100;
-		
-		//autoResizeY = true;
 	}
 	
 	public void AddData(float v)
 	{
 		if(values == null){
-			Debug.Log("addData");
 			values = new List<Vector3>();
 		}
 		min = Mathf.Min(min, v);
@@ -78,7 +75,6 @@ public class GraphParam{
 	public void Clear()
 	{
 		if(values != null && values.Count > 0){
-			Debug.Log("ValuesClear");
 			values.Clear();
 		}
 		max = 0;
@@ -89,33 +85,34 @@ public class GraphParam{
 
 [System.Serializable]
 public class ExtraLineParam{
+
+	public float maxY;
 	public float y;
 	public Color color = Color.red;
 	
 	[HideInInspector]
 	public float zoomY;
-	
-	public float maxY;
-	
-	//public bool autoResizeY;
-	
+
+
 	public ExtraLineParam()
 	{
 		y = 0;
 		color = Color.red;
 		zoomY = 1.0f;
 		maxY = 150;
-		//autoResizeY = true;
 	}
 }
 
 public class ParamViewer : MonoBehaviour {
-	
+
+	public static int WINDOW_COUNT = 0;
+	public static int BASE_WINDOW_ID = 0;
+
 	public enum Anchor{
 		UpperLeft, UpperRight, LowerLeft, LowerRight
 	}
 	
-	public int windowId = 0;
+	private int windowId = 0;
 	public GUISkin guiSkin;
 	public Anchor anchor = Anchor.UpperLeft;
 	
@@ -124,7 +121,7 @@ public class ParamViewer : MonoBehaviour {
 	public Color graphHeightColor = new Color(0,0,0,0.25f);
 	
 	public int graphHeight = 100;
-	public int graphHeightHalf;
+	private int graphHeightHalf;
 	public float zoomX = 1;
 	
 	public int bufferNum = 100;
@@ -133,8 +130,9 @@ public class ParamViewer : MonoBehaviour {
 	public List<ExtraLineParam> extralines;
 	
 	// Use this for initialization
-	void Start () {
-		
+	void Awake () {
+		WINDOW_COUNT++;
+		windowId = BASE_WINDOW_ID + WINDOW_COUNT;
 	}
 	
 	void UpdateMargin()
@@ -191,6 +189,10 @@ public class ParamViewer : MonoBehaviour {
 	public void AddData(string name, float v)
 	{
 		GraphParam g = GetGraphByName(name);
+		if (g == null) {
+			g = new GraphParam (name);
+			SetGraphParam (g);
+		}
 		if(g != null){
 			g.AddData(v);
 		}else{
@@ -203,6 +205,17 @@ public class ParamViewer : MonoBehaviour {
 		return graphs.Find(delegate(GraphParam graph) {
 			return graph.name == name;
 		});
+
+//		GraphParam g = graphs.Find(delegate(GraphParam graph) {
+//			return graph.name == name;
+//		});
+//		if (g != null) {
+//			return g;
+//		}
+//
+//		g = new GraphParam (name);
+//		this.SetGraphParam (g);
+//		return g;
 	}
 	
 	private void Clear()
@@ -220,13 +233,12 @@ public class ParamViewer : MonoBehaviour {
 		}
 		windowRect.height = 0;//reset windowRect height
 	}
-	//void OnPostRender()
 	
-	public Color guiColor = Color.white;
+//	public Color guiColor = Color.white;
 	
 	void OnGUI()
 	{
-		GUI.color = guiColor;
+//		GUI.color = guiColor;
 		
 		if(guiSkin != null){
 			GUI.skin = guiSkin;
@@ -234,8 +246,7 @@ public class ParamViewer : MonoBehaviour {
 		
 		graphHeightHalf = graphHeight / 2;
 		UpdateMargin();
-		
-		
+
 		windowRect = GUILayout.Window(windowId, windowRect, DoMyWindow, this.gameObject.name);
 		
 		UpdatePos();
@@ -437,13 +448,7 @@ public class ParamViewer : MonoBehaviour {
 	static Material lineMaterial;
 	static void CreateLineMaterial() {
 	    if( !lineMaterial ) {
-	        lineMaterial = new Material( "Shader \"Lines/Colored Blended\" {" +
-	            "SubShader { Pass { " +
-	            "    Blend SrcAlpha OneMinusSrcAlpha " +
-	            "    ZWrite Off Cull Off Fog { Mode Off } " +
-	            "    BindChannels {" +
-	            "      Bind \"vertex\", vertex Bind \"color\", color }" +
-	            "} } }" );
+			lineMaterial = new Material(Shader.Find("Hidden/Lines/Colored Blended"));
 	        lineMaterial.hideFlags = HideFlags.HideAndDontSave;
 	        lineMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
 	    }
