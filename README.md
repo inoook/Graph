@@ -1,4 +1,4 @@
-# ParamViewer
+# Graph
 
 ![Sample](screen.png)
 
