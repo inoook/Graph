@@ -8,7 +8,7 @@ public class GUIRectAnchor : MonoBehaviour {
 	}
 
 	[SerializeField]
-	ParamViewer paramViewer;
+	GraphViewer paramViewer;
 
 	public Anchor anchor = Anchor.UpperLeft;
 

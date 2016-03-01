@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 [System.Serializable]
-public class GraphParam{
+public class Graph{
 	
 	public enum DrawType
 	{
@@ -28,12 +28,12 @@ public class GraphParam{
 	public int bufferNum;
 	
 	//public bool autoResizeY;
-	public GraphParam(string name_) : this()
+	public Graph(string name_) : this()
 	{
 		name = name_;
 	}
 	
-	public GraphParam(string name_, float maxY_, Color color_, DrawType type_) : this()
+	public Graph(string name_, float maxY_, Color color_, DrawType type_) : this()
 	{
 		name = name_;
 		maxY = maxY_;
@@ -41,7 +41,7 @@ public class GraphParam{
 		drawType = type_;
 	}
 	
-	public GraphParam()
+	public Graph()
 	{
 		values = new List<Vector3>();
 		
@@ -84,7 +84,7 @@ public class GraphParam{
 }
 
 [System.Serializable]
-public class ExtraLineParam{
+public class HorizontalLine{
 
 	public float maxY;
 	public float y;
@@ -94,7 +94,7 @@ public class ExtraLineParam{
 	public float zoomY;
 
 
-	public ExtraLineParam()
+	public HorizontalLine()
 	{
 		y = 0;
 		color = Color.red;
@@ -103,7 +103,7 @@ public class ExtraLineParam{
 	}
 }
 
-public class ParamViewer : MonoBehaviour {
+public class GraphViewer : MonoBehaviour {
 
 	public static int WINDOW_COUNT = 0;
 	public static int BASE_WINDOW_ID = 0;
@@ -111,10 +111,11 @@ public class ParamViewer : MonoBehaviour {
 	
 	private int windowId = 0;
 	public GUISkin guiSkin;
-	
+
+	[Header("windowRect w, h override and auto resize by viewSize x, y.")]
 	public Rect windowRect = new Rect();
 	public Vector2 viewSize = new Vector2(100,100);
-	public Color graphHeightColor = new Color(0,0,0,0.25f);
+	public Color horitontalLineColor = new Color(0,0,0,0.25f);
 	
 	private int graphHeight;
 	private int graphHeightHalf;
@@ -122,8 +123,8 @@ public class ParamViewer : MonoBehaviour {
 	
 	public int bufferNum = 100;
 	
-	public List<GraphParam> graphs;
-	public List<ExtraLineParam> extralines;
+	public List<Graph> graphs;
+	public List<HorizontalLine> extralines;
 	
 	// Use this for initialization
 	void Awake () {
@@ -136,7 +137,7 @@ public class ParamViewer : MonoBehaviour {
 		windowRect.width = viewSize.x;
 	}
 	
-	public void SetGraphParam(GraphParam graph)
+	public void SetGraphParam(Graph graph)
 	{
 		graph.bufferNum = this.bufferNum;
 		graphs.Add(graph);
@@ -145,16 +146,16 @@ public class ParamViewer : MonoBehaviour {
 	public void AddData(int id, float v)
 	{
 		if(id >= graphs.Count){
-			GraphParam g = new GraphParam();
+			Graph g = new Graph();
 			graphs.Add(g);
 		}
 		graphs[id].AddData(v);
 	}
 	public void AddData(string name, float v)
 	{
-		GraphParam g = GetGraphByName(name);
+		Graph g = GetGraphByName(name);
 		if (g == null) {
-			g = new GraphParam (name);
+			g = new Graph (name);
 			SetGraphParam (g);
 		}
 		if(g != null){
@@ -164,28 +165,17 @@ public class ParamViewer : MonoBehaviour {
 		}
 	}
 	
-	public GraphParam GetGraphByName(string name)
+	public Graph GetGraphByName(string name)
 	{
-		return graphs.Find(delegate(GraphParam graph) {
+		return graphs.Find(delegate(Graph graph) {
 			return graph.name == name;
 		});
-
-//		GraphParam g = graphs.Find(delegate(GraphParam graph) {
-//			return graph.name == name;
-//		});
-//		if (g != null) {
-//			return g;
-//		}
-//
-//		g = new GraphParam (name);
-//		this.SetGraphParam (g);
-//		return g;
 	}
 	
 	private void Clear()
 	{
 		for(int i = 0; i < graphs.Count; i++){
-			GraphParam graph = graphs[i];
+			Graph graph = graphs[i];
 			graph.Clear();
 		}
 	}
@@ -232,21 +222,19 @@ public class ParamViewer : MonoBehaviour {
 		DrawBaseLine();
 		
 		for(int n = 0; n < graphs.Count; n++){
-			GraphParam graph = graphs[n];
+			Graph graph = graphs[n];
 			List<Vector3> values = graph.values;
 			
 			if(values != null && values.Count > 0){
 				float maxY = graph.maxY;
 				
 				graph.zoomY = graphHeightHalf / maxY;
-				
-				//float zoomX = graph.zoomX;
+
 				float zoomY = graph.zoomY;
 				float min = graph.min;
 				float max = graph.max;
 				
 				Color color = graph.color;
-				//int bufferNum = graph.bufferNum;
 				
 				Vector3[] _values = values.ToArray();
 				
@@ -254,7 +242,6 @@ public class ParamViewer : MonoBehaviour {
 					_values[i].x = i * zoomX;
 					_values[i].y = -1 * _values[i].y * zoomY + graphHeightHalf;
 				}
-				//windowRect.width = bufferNum*zoomX;
 				
 				string name = graph.name;
 				
@@ -263,7 +250,7 @@ public class ParamViewer : MonoBehaviour {
 				GUI.Label(new Rect(4,18*n,280, 50), name +": "+ v.ToString("0.00")+" / min: " + min.ToString("0.00") + " / max: "+ max.ToString("0.00"));
 				
 				// draw
-				if(graph.drawType == GraphParam.DrawType.Line){
+				if(graph.drawType == Graph.DrawType.Line){
 					DrawAAPolyLine(_values, color);
 				}else{
 					DrawBarLine(_values, color);
@@ -292,7 +279,7 @@ public class ParamViewer : MonoBehaviour {
 		lineMaterial.SetPass(0);
 		
 		UnityEngine.GL.Begin(UnityEngine.GL.LINES);
-		UnityEngine.GL.Color( graphHeightColor );
+		UnityEngine.GL.Color( horitontalLineColor );
 		UnityEngine.GL.Vertex(new Vector3(0,0,0));
 		UnityEngine.GL.Vertex(new Vector3(bufferNum*zoomX,0,0));
 		
@@ -306,7 +293,7 @@ public class ParamViewer : MonoBehaviour {
 	}
 	
 	
-	public void SetExtraLine(ExtraLineParam extraLine)
+	public void SetExtraLine(HorizontalLine extraLine)
 	{
 		extralines.Add(extraLine);
 	}
@@ -322,7 +309,7 @@ public class ParamViewer : MonoBehaviour {
 		
 		UnityEngine.GL.Begin(UnityEngine.GL.LINES);
 		for(int i = 0; i < extralines.Count; i++){
-			ExtraLineParam lineParam = extralines[i];
+			HorizontalLine lineParam = extralines[i];
 			Color color = lineParam.color;
 			float maxY = lineParam.maxY;
 			//if(lineParam.autoResizeY){

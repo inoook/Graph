@@ -3,10 +3,10 @@ using System.Collections;
 
 public class Test2 : MonoBehaviour {
 
-	public ParamViewer pramView;
+	public GraphViewer pramView;
 
-	public GraphParam graph;
-	public ExtraLineParam extraLine;
+	public Graph graph;
+	public HorizontalLine extraLine;
 	
 	[Header("Test")]
 	public float v = 0;

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Test : MonoBehaviour {
 	
-	public ParamViewer pramView;
+	public GraphViewer pramView;
 	
 	[Header("Test")]
 	public float v = 0;
@@ -14,18 +14,18 @@ public class Test : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		
-		GraphParam graph = new GraphParam("param_v");
+		Graph graph = new Graph("param_v");
 		graph.maxY = 5.0f;
 		graph.color = Color.blue;
-		graph.drawType = GraphParam.DrawType.Line;
+		graph.drawType = Graph.DrawType.Line;
 		pramView.SetGraphParam(graph);
 		
-		GraphParam graph2 = new GraphParam("param_w");
+		Graph graph2 = new Graph("param_w");
 		graph2.maxY = 5.0f;
 		graph2.color = Color.green;
 		pramView.SetGraphParam(graph2);
 		
-		ExtraLineParam extraLine = new ExtraLineParam();
+		HorizontalLine extraLine = new HorizontalLine();
 		extraLine.maxY = 5.0f;
 		extraLine.color = Color.magenta;
 		extraLine.y = 5.0f;
