@@ -18,12 +18,12 @@ public class Test : MonoBehaviour {
 		graph.maxY = 5.0f;
 		graph.color = Color.blue;
 		graph.drawType = Graph.DrawType.Line;
-		pramView.SetGraphParam(graph);
+		pramView.SetGraph(graph);
 		
 		Graph graph2 = new Graph("param_w");
 		graph2.maxY = 5.0f;
 		graph2.color = Color.green;
-		pramView.SetGraphParam(graph2);
+		pramView.SetGraph(graph2);
 		
 		HorizontalLine extraLine = new HorizontalLine();
 		extraLine.maxY = 5.0f;

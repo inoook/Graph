@@ -45,7 +45,7 @@ public class Graph{
 	{
 		values = new List<Vector3>();
 		
-		zoomX = 2.5f;
+		zoomX = 1;
 		zoomY = 1;
 		maxY = 150;
 		color = Color.red;
@@ -137,7 +137,7 @@ public class GraphViewer : MonoBehaviour {
 		windowRect.width = viewSize.x;
 	}
 	
-	public void SetGraphParam(Graph graph)
+	public void SetGraph(Graph graph)
 	{
 		graph.bufferNum = this.bufferNum;
 		graphs.Add(graph);
@@ -156,7 +156,7 @@ public class GraphViewer : MonoBehaviour {
 		Graph g = GetGraphByName(name);
 		if (g == null) {
 			g = new Graph (name);
-			SetGraphParam (g);
+			SetGraph (g);
 		}
 		if(g != null){
 			g.AddData(v);
@@ -181,6 +181,7 @@ public class GraphViewer : MonoBehaviour {
 	}
 	void Update()
 	{
+		bufferNum = Mathf.Max (2, bufferNum);
 		for(int i = 0; i < graphs.Count; i++){
 			graphs[i].zoomX = zoomX;
 			graphs[i].bufferNum = bufferNum;

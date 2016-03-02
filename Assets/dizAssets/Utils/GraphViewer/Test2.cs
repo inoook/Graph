@@ -17,7 +17,7 @@ public class Test2 : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-		pramView.SetGraphParam(graph);
+		pramView.SetGraph(graph);
 		pramView.SetExtraLine(extraLine);
 	}
 
