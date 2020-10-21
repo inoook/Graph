@@ -7,8 +7,7 @@ public class GUIRectAnchor : MonoBehaviour {
 		UpperLeft, UpperRight, LowerLeft, LowerRight
 	}
 
-	[SerializeField]
-	GraphViewer paramViewer;
+	[SerializeField] GraphViewer paramViewer = null;
 
 	public Anchor anchor = Anchor.UpperLeft;
 
@@ -22,8 +21,8 @@ public class GUIRectAnchor : MonoBehaviour {
 	// Update is called once per frame
 	void OnGUI () {
 		Rect rect = new Rect ();
-		float w = paramViewer.windowRect.width;
-		float h = paramViewer.windowRect.height;
+		float w = paramViewer.WindowRect.width;
+		float h = paramViewer.WindowRect.height;
 
 		if (anchor == Anchor.UpperLeft || anchor == Anchor.LowerLeft) {
 			rect.x = margin.x;
@@ -40,6 +39,6 @@ public class GUIRectAnchor : MonoBehaviour {
 		}
 		rect.width = w;
 		rect.height = h;
-		paramViewer.windowRect = rect;
+		paramViewer.WindowRect = rect;
 	}
 }
