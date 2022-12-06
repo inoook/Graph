@@ -398,41 +398,103 @@ public class GraphViewer : MonoBehaviour {
 		}
 		UnityEngine.GL.End();
 	}
-	
-	void DrawAAPolyLine(Vector3[] vectors, Color color){
-        
+
+	void DrawAAPolyLine(Vector3[] vectors, Color color)
+	{
+		if (vectors.Length < 2) { return; }
+
 		UnityEngine.GL.Begin(UnityEngine.GL.LINES);
-		UnityEngine.GL.Color( color );
-		for(int i = 0; i < vectors.Length-1; i++){
-			if( (vectors[i].y <= graphHeight && vectors[i].y >= 0 ) && (vectors[i+1].y <= graphHeight && vectors[i+1].y >= 0 ) ){
-				UnityEngine.GL.Vertex(vectors[i] + offset);
-				UnityEngine.GL.Vertex(vectors[i+1] + offset);
+		UnityEngine.GL.Color(color);
+		for (int i = 0; i < vectors.Length-1; i++)
+		{
+			Vector3 current = vectors[i];
+			Vector3 next = vectors[i + 1];
+			if (current.y > graphHeight)
+			{
+				current = getClossPoint(current, new Vector3(0, graphHeight, 0), next, new Vector3(10, graphHeight, 0));
 			}
-			else{ 
-				if( vectors[i].y > graphHeight && vectors[i+1].y < graphHeight ){
-					Vector3 pos = getClossPoint(vectors[i], new Vector3( 0, graphHeight, 0 ), vectors[i+1], new Vector3( 10, graphHeight, 0 ) );
-					UnityEngine.GL.Vertex(vectors[i+1] + offset);
-					UnityEngine.GL.Vertex(pos + offset);
-				}else if( vectors[i].y < graphHeight && vectors[i+1].y > graphHeight ) {
-					Vector3 pos = getClossPoint(vectors[i], new Vector3( 0, graphHeight, 0 ), vectors[i+1], new Vector3( 10, graphHeight, 0 ) );
-					UnityEngine.GL.Vertex(vectors[i] + offset);
-					UnityEngine.GL.Vertex(pos + offset);
-				}
-				if( vectors[i].y > 0 && vectors[i+1].y < 0 ){
-					Vector3 pos = getClossPoint(vectors[i], new Vector3( 0, 0, 0 ), vectors[i+1], new Vector3( 10, 0, 0 ) );
-					UnityEngine.GL.Vertex(vectors[i] + offset);
-					UnityEngine.GL.Vertex(pos + offset);
-				}else if( vectors[i].y < 0 && vectors[i+1].y > 0 ){
-					Vector3 pos = getClossPoint(vectors[i], new Vector3( 0, 0, 0 ), vectors[i+1], new Vector3( 10, 0, 0 ) );
-					UnityEngine.GL.Vertex(vectors[i+1] + offset);
-					UnityEngine.GL.Vertex(pos + offset);
-				}
+			else if (current.y < 0)
+			{
+				current = getClossPoint(current, new Vector3(0, 0, 0), next, new Vector3(10, 0, 0));
 			}
+			if (next.y > graphHeight)
+			{
+				next = getClossPoint(current, new Vector3(0, graphHeight, 0), next, new Vector3(10, graphHeight, 0));
+			}
+			else if (next.y < 0)
+			{
+				next = getClossPoint(current, new Vector3(0, 0, 0), next, new Vector3(10, 0, 0));
+			}
+
+			UnityEngine.GL.Vertex(current + offset);
+			UnityEngine.GL.Vertex(next + offset);
 		}
-		
+
 		UnityEngine.GL.End();
-    }
-	void DrawBarLine(Vector3[] vectors, Color color){
+	}
+
+    //void DrawAAPolyLine__(Vector3[] vectors, Color color)
+    //{
+
+    //    UnityEngine.GL.Begin(UnityEngine.GL.LINES);
+    //    UnityEngine.GL.Color(color);
+    //    for (int i = 0; i < vectors.Length - 1; i++)
+    //    {
+    //        if ((vectors[i].y <= graphHeight && vectors[i].y >= 0) && (vectors[i + 1].y <= graphHeight && vectors[i + 1].y >= 0))
+    //        {
+    //            UnityEngine.GL.Vertex(vectors[i] + offset);
+    //            UnityEngine.GL.Vertex(vectors[i + 1] + offset);
+    //        }
+    //        else
+    //        {
+    //            if (vectors[i].y > graphHeight && vectors[i + 1].y < 0)
+    //            {
+    //                Vector3 pos0 = getClossPoint(vectors[i], new Vector3(0, graphHeight, 0), vectors[i + 1], new Vector3(10, graphHeight, 0));
+    //                Vector3 pos1 = getClossPoint(vectors[i], new Vector3(0, 0, 0), vectors[i + 1], new Vector3(10, 0, 0));
+    //                UnityEngine.GL.Vertex(pos0 + offset);
+    //                UnityEngine.GL.Vertex(pos1 + offset);
+    //            }
+    //            else if (vectors[i].y < 0 && vectors[i + 1].y > graphHeight)
+    //            {
+    //                Vector3 pos0 = getClossPoint(vectors[i], new Vector3(0, 0, 0), vectors[i + 1], new Vector3(10, 0, 0));
+    //                Vector3 pos1 = getClossPoint(vectors[i], new Vector3(0, graphHeight, 0), vectors[i + 1], new Vector3(10, graphHeight, 0));
+    //                UnityEngine.GL.Vertex(pos0 + offset);
+    //                UnityEngine.GL.Vertex(pos1 + offset);
+    //            }
+    //            else
+    //            {
+    //                if (vectors[i].y > graphHeight && vectors[i + 1].y < graphHeight)
+    //                {
+    //                    Vector3 pos = getClossPoint(vectors[i], new Vector3(0, graphHeight, 0), vectors[i + 1], new Vector3(10, graphHeight, 0));
+    //                    UnityEngine.GL.Vertex(vectors[i + 1] + offset);
+    //                    UnityEngine.GL.Vertex(pos + offset);
+    //                }
+    //                else if (vectors[i].y < graphHeight && vectors[i + 1].y > graphHeight)
+    //                {
+    //                    Vector3 pos = getClossPoint(vectors[i], new Vector3(0, graphHeight, 0), vectors[i + 1], new Vector3(10, graphHeight, 0));
+    //                    UnityEngine.GL.Vertex(vectors[i] + offset);
+    //                    UnityEngine.GL.Vertex(pos + offset);
+    //                }
+    //                if (vectors[i].y > 0 && vectors[i + 1].y < 0)
+    //                {
+    //                    Vector3 pos = getClossPoint(vectors[i], new Vector3(0, 0, 0), vectors[i + 1], new Vector3(10, 0, 0));
+    //                    UnityEngine.GL.Vertex(vectors[i] + offset);
+    //                    UnityEngine.GL.Vertex(pos + offset);
+    //                }
+    //                else if (vectors[i].y < 0 && vectors[i + 1].y > 0)
+    //                {
+    //                    Vector3 pos = getClossPoint(vectors[i], new Vector3(0, 0, 0), vectors[i + 1], new Vector3(10, 0, 0));
+    //                    UnityEngine.GL.Vertex(vectors[i + 1] + offset);
+    //                    UnityEngine.GL.Vertex(pos + offset);
+    //                }
+    //            }
+    //        }
+    //    }
+
+    //    UnityEngine.GL.End();
+    //}
+
+    void DrawBarLine(Vector3[] vectors, Color color){
 		
 		UnityEngine.GL.Begin(UnityEngine.GL.LINES);
 		UnityEngine.GL.Color( color );

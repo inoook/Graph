@@ -13,6 +13,7 @@ public class Sample2 : MonoBehaviour {
     [SerializeField] float w = 0;
 
     [SerializeField] float amp = 5.0f;
+    [SerializeField] float speedAmp = 1.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -25,7 +26,7 @@ public class Sample2 : MonoBehaviour {
 	float t = 0;
 	// Update is called once per frame
 	void Update () {
-		t += Time.deltaTime;
+		t += Time.deltaTime * speedAmp;
 		v = amp * Mathf.Sin(t*2.0f);
 		w = amp * Mathf.Cos(t*2.0f);
 
