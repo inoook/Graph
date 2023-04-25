@@ -1,4 +1,3 @@
-//using UnityEditor;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -224,8 +223,73 @@ public class GraphViewer : MonoBehaviour {
 		}
 	}
 
+	//
+	void OnGUI()
+	{
+		if (guiSkin != null)
+		{
+			GUI.skin = guiSkin;
+		}
 
-    void OnGUI()
+		GUI.matrix = Matrix4x4.Scale(Vector3.one * guiScale);
+
+		graphHeight = (int)viewSize.y;
+
+		graphHeightHalf = drawPlusOnly ? graphHeight : graphHeight / 2;
+
+		if (drawAsWindow)
+		{
+			windowRect.x = windowPos.x;
+			windowRect.y = windowPos.y;
+
+			windowRect = GUILayout.Window(windowId, windowRect, DoMyWindow, this.gameObject.name);
+
+			windowPos.x = windowRect.x;
+			windowPos.y = windowRect.y;
+		}
+		else
+		{
+			windowRect.x = windowPos.x;
+			windowRect.y = windowPos.y;
+			windowRect.height = viewSize.y + 80;
+
+			GUILayout.BeginArea(windowRect);
+			GUILayout.BeginVertical("box");
+
+			windowRect.width = viewSize.x;
+
+			GUILayout.BeginArea(new Rect(0, 0, windowRect.width, graphHeight));
+			Color myColor = GUI.color;
+			Color c = myColor;
+
+			GUI.color = myColor;
+
+			offset = Vector3.zero;
+
+			zoomX = windowRect.width / bufferNum;
+
+			// draw
+			DrawGraph();
+
+
+			GUI.color = Color.white;
+
+			GUILayout.EndArea();
+			GUILayout.Space(graphHeight + 2);
+
+			if (GUILayout.Button("CLEAR"))
+			{
+				Clear();
+			}
+
+			GUILayout.EndVertical();
+			GUILayout.EndArea();
+		}
+	}
+	[SerializeField] bool drawAsWindow = true;
+	//
+
+	void OnGUI__()
 	{
 		if (guiSkin != null){
 			GUI.skin = guiSkin;
@@ -245,6 +309,7 @@ public class GraphViewer : MonoBehaviour {
         windowPos.x = windowRect.x;
         windowPos.y = windowRect.y;
     }
+
 
 	Vector3 offset;
 
@@ -333,7 +398,6 @@ public class GraphViewer : MonoBehaviour {
 
 		GUILayout.BeginArea(new Rect(0,18, windowRect.width, graphHeight));
         Color myColor = GUI.color;
-		Color c = myColor;
 		
 		GUI.color = myColor;
 
@@ -371,8 +435,7 @@ public class GraphViewer : MonoBehaviour {
 		UnityEngine.GL.Vertex(new Vector3(bufferNum*zoomX,graphHeight,0) + offset);
 		UnityEngine.GL.End();
 	}
-	
-	
+
 	public void SetExtraLine(HorizontalLine extraLine)
 	{
 		extralines.Add(extraLine);
@@ -432,67 +495,6 @@ public class GraphViewer : MonoBehaviour {
 
 		UnityEngine.GL.End();
 	}
-
-    //void DrawAAPolyLine__(Vector3[] vectors, Color color)
-    //{
-
-    //    UnityEngine.GL.Begin(UnityEngine.GL.LINES);
-    //    UnityEngine.GL.Color(color);
-    //    for (int i = 0; i < vectors.Length - 1; i++)
-    //    {
-    //        if ((vectors[i].y <= graphHeight && vectors[i].y >= 0) && (vectors[i + 1].y <= graphHeight && vectors[i + 1].y >= 0))
-    //        {
-    //            UnityEngine.GL.Vertex(vectors[i] + offset);
-    //            UnityEngine.GL.Vertex(vectors[i + 1] + offset);
-    //        }
-    //        else
-    //        {
-    //            if (vectors[i].y > graphHeight && vectors[i + 1].y < 0)
-    //            {
-    //                Vector3 pos0 = getClossPoint(vectors[i], new Vector3(0, graphHeight, 0), vectors[i + 1], new Vector3(10, graphHeight, 0));
-    //                Vector3 pos1 = getClossPoint(vectors[i], new Vector3(0, 0, 0), vectors[i + 1], new Vector3(10, 0, 0));
-    //                UnityEngine.GL.Vertex(pos0 + offset);
-    //                UnityEngine.GL.Vertex(pos1 + offset);
-    //            }
-    //            else if (vectors[i].y < 0 && vectors[i + 1].y > graphHeight)
-    //            {
-    //                Vector3 pos0 = getClossPoint(vectors[i], new Vector3(0, 0, 0), vectors[i + 1], new Vector3(10, 0, 0));
-    //                Vector3 pos1 = getClossPoint(vectors[i], new Vector3(0, graphHeight, 0), vectors[i + 1], new Vector3(10, graphHeight, 0));
-    //                UnityEngine.GL.Vertex(pos0 + offset);
-    //                UnityEngine.GL.Vertex(pos1 + offset);
-    //            }
-    //            else
-    //            {
-    //                if (vectors[i].y > graphHeight && vectors[i + 1].y < graphHeight)
-    //                {
-    //                    Vector3 pos = getClossPoint(vectors[i], new Vector3(0, graphHeight, 0), vectors[i + 1], new Vector3(10, graphHeight, 0));
-    //                    UnityEngine.GL.Vertex(vectors[i + 1] + offset);
-    //                    UnityEngine.GL.Vertex(pos + offset);
-    //                }
-    //                else if (vectors[i].y < graphHeight && vectors[i + 1].y > graphHeight)
-    //                {
-    //                    Vector3 pos = getClossPoint(vectors[i], new Vector3(0, graphHeight, 0), vectors[i + 1], new Vector3(10, graphHeight, 0));
-    //                    UnityEngine.GL.Vertex(vectors[i] + offset);
-    //                    UnityEngine.GL.Vertex(pos + offset);
-    //                }
-    //                if (vectors[i].y > 0 && vectors[i + 1].y < 0)
-    //                {
-    //                    Vector3 pos = getClossPoint(vectors[i], new Vector3(0, 0, 0), vectors[i + 1], new Vector3(10, 0, 0));
-    //                    UnityEngine.GL.Vertex(vectors[i] + offset);
-    //                    UnityEngine.GL.Vertex(pos + offset);
-    //                }
-    //                else if (vectors[i].y < 0 && vectors[i + 1].y > 0)
-    //                {
-    //                    Vector3 pos = getClossPoint(vectors[i], new Vector3(0, 0, 0), vectors[i + 1], new Vector3(10, 0, 0));
-    //                    UnityEngine.GL.Vertex(vectors[i + 1] + offset);
-    //                    UnityEngine.GL.Vertex(pos + offset);
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    UnityEngine.GL.End();
-    //}
 
     void DrawBarLine(Vector3[] vectors, Color color){
 		
